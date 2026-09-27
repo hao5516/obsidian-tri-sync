@@ -8,6 +8,7 @@ assert.deepEqual(json('dist/tri-sync/manifest.json'), manifest);
 assert.equal(pkg.version, manifest.version);
 assert.equal(json('package-lock.json').packages[''].version, pkg.version);
 assert.equal(json('versions.json')[manifest.version], manifest.minAppVersion);
+assert.equal(readFileSync('dist/tri-sync/styles.css', 'utf8'), readFileSync('styles.css', 'utf8'));
 const bundle = readFileSync('dist/tri-sync/main.js', 'utf8');
 for (const holder of ['Paul Miller', 'Michael Hart', '2026 hao5516']) {
   assert.ok(bundle.includes(holder), `Missing bundled license notice: ${holder}`);

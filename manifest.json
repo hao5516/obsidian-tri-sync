@@ -1,5 +1,5 @@
 {
-  "id": "tri-sync", "name": "Tri Sync", "version": "0.1.1",
+  "id": "tri-sync", "name": "Tri Sync", "version": "0.2.0",
   "minAppVersion": "1.8.0", "description": "Sync notes through WebDAV, S3-compatible storage, or Baidu Netdisk, with conflict copies and local backups.",
   "author": "hao5516", "authorUrl": "https://github.com/hao5516", "isDesktopOnly": false
 }

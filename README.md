@@ -1,8 +1,21 @@
-# Tri Sync 三端同步 — 0.1.1
+# Tri Sync 三端同步 — 0.2.0
 
 Sync notes through WebDAV, S3-compatible storage, or Baidu Netdisk, with conflict copies and local backups. The interface currently uses Chinese. This community plugin is not affiliated with Obsidian Sync.
 
-**Submission status:** prepared for community review, not yet listed or approved. Real cloud-account integration and mobile-device testing remain outstanding. See [submission notes](docs/COMMUNITY-SUBMISSION.md).
+Available in the [Obsidian Community directory](https://community.obsidian.md/plugins/tri-sync). New releases are checked by the directory before being offered as updates. Real cloud-account integration and physical mobile-device testing remain outstanding.
+
+## 0.2.0：更清楚的同步界面
+
+- 点击侧边栏云朵图标，打开同步面板；立即同步、连接设置、测试连接都在这里。
+- 实时显示连接、读取历史和检查文件的进度；保存上次结果，重启后仍可查看。
+- 冲突和跳过的文件附带原因，最多保留 100 条说明；从「查看备份与副本」搜索并打开文件。
+- 连接窗口按服务显示必需信息；密钥默认隐藏，支持显示/隐藏。先测试，再保存，也可以取消而不改变配置。
+- 自动同步、间隔和文件大小上限收在「自动同步与高级选项」中。
+- 跟随主题，适配窄屏；原有 0.1.x 配置和同步基线可以继续使用。
+
+![同步面板预览，数字为演示数据](docs/images/sync-panel.png)
+
+上图是实际界面组件在模拟宿主中的预览，统计为演示数据；不是云端实测记录。
 
 ### Disclosures / 网络与隐私说明
 
@@ -32,14 +45,18 @@ License: [MIT](LICENSE), copyright 2026 hao5516. Bundled dependencies: `@noble/h
 
 ## 安装
 
-1. 从 [Releases](https://github.com/hao5516/obsidian-tri-sync/releases) 下载 `tri-sync-0.1.1.zip` 并解压，得到 `tri-sync` 文件夹，内含 `main.js`、`manifest.json` 和许可证声明。
-2. 在每台设备的笔记库中，将这个文件夹放到 `.obsidian/plugins/tri-sync/`。不要多嵌套一层目录。
+推荐在 Obsidian「设置 → 第三方插件 → 浏览」搜索 **Tri Sync** 安装。已安装用户点击「检查更新」，目录检测并审核新版本后即可更新；本插件不会自行下载安装更新。
+
+手动安装：
+
+1. 从 [Releases](https://github.com/hao5516/obsidian-tri-sync/releases) 下载 `main.js`、`manifest.json`、`styles.css` 三个文件。
+2. 在每台设备的笔记库中，将这三个文件放到 `.obsidian/plugins/tri-sync/`。不要多嵌套一层目录。
 3. 重启 Obsidian，进入「设置 → 第三方插件」，允许并启用 **Tri Sync**。
-4. 打开插件设置，三端配置相同的服务和远端目录。使用不同笔记库时必须使用不同远端目录。
+4. 打开插件设置或侧边栏云朵图标，点击「开始配置」，三端配置相同的服务和远端目录。使用不同笔记库时必须使用不同远端目录。
 5. 在内容最完整的设备上点击「测试连接」，再点「立即同步」。完成后在其他设备分别执行同步。
 6. 验证后可开启自动同步，默认间隔 300 秒，最短 60 秒。
 
-插件未上架社区市场。手机需要借助系统文件管理或电脑传输来放置插件文件，具体取决于设备对隐藏目录的访问能力；iOS 手动安装可能需要电脑协助。仅分发上面两个文件；不要把桌面端的 `data.json` 复制给其他设备，因为其中包含凭据和本机同步基线。
+手机也可以从社区插件目录安装。若选择手动安装，需要系统文件管理或电脑协助来访问插件目录。不要把桌面端的 `data.json` 复制给其他设备，其中包含凭据、本机同步基线和最近一次同步结果。
 
 ## WebDAV 配置示例
 
@@ -99,11 +116,12 @@ npm ci
 npm run lint
 npm run build
 npm test
+node scripts/check-release.mjs
 ```
 
 产物位于 `dist/tri-sync/`。`src/core.ts` 是不依赖 Obsidian 的同步核心，`src/stores.ts` 提供远端适配器，`src/main.ts` 是插件入口与设置页。添加其他服务时实现 `Store` 的 `init / list / get / put` 即可；服务必须保留不可变对象且能够完整列举同步目录。
 
-自动化测试覆盖三端收敛、并发编辑、冲突处理、上传中断重试、损坏内容、编辑竞争、本地删除、路径安全、大小限制，以及百度协议的模拟上传下载。未完成 WebDAV / S3 / 百度实账号集成测试和 Android / iOS 真机测试。
+25 项自动化测试覆盖三端收敛、并发编辑、冲突处理、上传中断重试、损坏内容、编辑竞争、本地删除、路径安全、大小限制、配置校验、错误信息、进度报告，以及百度协议的模拟上传下载。`npm run test:ui` 使用本机 Edge 和模拟 Obsidian 宿主检查实际 UI 组件的深浅色、窄屏与交互，截图写入 `dist/ui/`；它不能代替真机测试。未完成 WebDAV / S3 / 百度实账号集成测试和 Android / iOS 真机测试。
 
 ## 接口参考
 

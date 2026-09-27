@@ -1,6 +1,6 @@
 # Community submission notes
 
-Status: preparation only. No directory entry has been submitted or approved.
+Status: the owner submitted the plugin and its public listing is available at https://community.obsidian.md/plugins/tri-sync. The notes below describe the original submission process. Each update is reviewed independently by the directory.
 
 Local verification for 0.1.1: official Obsidian ESLint checks passed with zero warnings (including manifest and license rules), TypeScript and bundle build passed, and all 21 automated tests passed. These results are not a community-directory approval.
 
@@ -18,7 +18,7 @@ Local verification for 0.1.1: official Obsidian ESLint checks passed with zero w
 
 ## Required owner actions
 
-1. Make the GitHub repository publicly accessible, or follow the directory's separate public-release/private-source workflow. This repository was explicitly created private and has not been made public during preparation.
+1. The owner approved making this repository public with an MIT license. The visibility change is complete.
 2. Review the prepared MIT license before making the source public.
 3. Sign in at https://community.obsidian.md with your Obsidian account and connect GitHub account `hao5516`.
 4. Open Plugins → New plugin; enter the repository URL and choose yourself as owner.

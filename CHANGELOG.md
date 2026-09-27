@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.2.0 — 2026-09-28
+
+- Replace the one-click ribbon with a responsive sync dashboard; retain the immediate sync command.
+- Add a guided connection dialog with provider selection, masked credentials, validation and explicit save/cancel.
+- Show live progress, persist the last sync result per backend, and explain up to 100 conflicting/skipped files.
+- Add searchable local backups, conflict copies and incoming attachment versions.
+- Collapse automatic sync and advanced limits; retain existing settings and baselines.
+- Add theme-aware CSS, including mobile layouts. Releases now include `styles.css` alongside `main.js` and `manifest.json`.
+- Provide actionable connection errors, redact credentials, and avoid repeating identical automatic-sync error notices.
+- Validation: official lint, build, 25 automated tests, and browser UI smoke checks. Cloud-provider and physical-device testing remains outstanding.
+
 ## 0.1.1 — 2026-09-27
 
 - Prepare community submission metadata, MIT license, third-party attribution and network/privacy disclosures.

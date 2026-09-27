@@ -1,0 +1,46 @@
+import { build } from 'esbuild';
+import { chromium } from 'playwright-core';
+import { readFile, mkdir, writeFile } from 'node:fs/promises';
+import { resolve } from 'node:path';
+import { pathToFileURL } from 'node:url';
+import assert from 'node:assert/strict';
+
+await mkdir('dist/ui', {recursive:true});
+await build({entryPoints:['tests/ui-preview.ts'],bundle:true,format:'iife',platform:'browser',outfile:'dist/ui/preview.js',alias:{obsidian:resolve('tests/browser-mock.ts')}});
+const base=`:root{--background-primary:#fff;--background-secondary:#f6f6f7;--background-modifier-border:#e4e4e7;--interactive-accent:#7856d6;--text-accent:#7856d6;--text-on-accent:white;--text-normal:#24232a;--text-muted:#6b6a73;--text-faint:#898891;--text-warning:#b57816;--font-ui-medium:14px;--font-ui-small:13px;--font-ui-smaller:12px}*{box-sizing:border-box}body{margin:0;padding:30px;background:#ecebf0;font-family:Arial,'Microsoft YaHei',sans-serif;color:var(--text-normal)}body.dark{--background-primary:#242329;--background-secondary:#2c2b32;--background-modifier-border:#403e48;--text-normal:#eeeef1;--text-muted:#b1aeba;--text-faint:#8d899b;--text-accent:#b79aff;background:#18171c}.modal{background:var(--background-primary);padding:28px;border-radius:16px;margin:0 auto 20px;box-shadow:0 18px 65px #0002}.modal-title{font-size:17px;font-weight:600;margin-bottom:24px}button,input,select{font:inherit;color:var(--text-normal);border:1px solid var(--background-modifier-border);background:var(--background-primary);border-radius:6px;padding:7px 10px}button{cursor:pointer}button:disabled{opacity:.5;cursor:default}button.mod-cta{background:var(--interactive-accent);color:white;border-color:var(--interactive-accent)}.setting-item{display:flex;align-items:center;gap:16px;padding:16px 0;border-bottom:1px solid var(--background-modifier-border)}.setting-item-info{flex:1}.setting-item-name{font-size:14px;font-weight:500}.setting-item-description{font-size:12px;color:var(--text-muted);line-height:1.6;margin-top:5px}.setting-item-control{display:flex;gap:6px;align-items:center}p{line-height:1.6}@media(max-width:500px){body{padding:8px}.modal{padding:18px}}`;
+await writeFile('dist/ui/preview.html',`<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>${base}\n${await readFile('styles.css','utf8')}</style><body><script src="preview.js"></script></body></html>`);
+const browser=await chromium.launch({executablePath:'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',headless:true});
+try {
+ const page=await browser.newPage({viewport:{width:1000,height:900}});const errors=[];
+ page.on('pageerror',error=>errors.push(error.message));
+ await page.goto(pathToFileURL(resolve('dist/ui/preview.html')).href);
+ await page.screenshot({path:'dist/ui/desktop-light.png',fullPage:true});
+ await page.evaluate(()=>document.body.classList.add('dark'));
+ await page.screenshot({path:'dist/ui/desktop-dark.png',fullPage:true});
+ await page.setViewportSize({width:390,height:844});
+ await page.screenshot({path:'dist/ui/mobile-dark.png',fullPage:true});
+ assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth),'Mobile dashboard overflows');
+ await page.getByRole('button',{name:'连接设置',exact:true}).click();
+ await page.locator('.modal').last().screenshot({path:'dist/ui/mobile-connection.png'});
+ assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth),'Mobile connection form overflows');
+ assert.equal(await page.getByLabel('应用密码',{exact:true}).getAttribute('type'),'password');
+ await page.getByRole('button',{name:'百度网盘',exact:true}).click();
+ await page.getByRole('button',{name:'保存连接',exact:true}).click();
+ assert.match(await page.locator('.tri-sync-feedback').innerText(),/授权令牌/);
+ await page.getByRole('button',{name:'S3 存储',exact:true}).click();
+ assert.equal(await page.getByLabel('密钥密码',{exact:true}).getAttribute('type'),'password');
+ await page.getByRole('button',{name:'WebDAV',exact:true}).click();
+ await page.getByLabel('服务地址',{exact:true}).fill('http://invalid.example');
+ await page.getByRole('button',{name:'保存连接',exact:true}).click();
+ assert.match(await page.locator('.tri-sync-feedback').innerText(),/https/);
+ await page.getByLabel('服务地址',{exact:true}).fill('https://dav.example.com/dav');
+ await page.getByRole('button',{name:'保存连接',exact:true}).click();
+ assert.equal(await page.locator('.tri-sync-config').count(),0);
+ await page.getByRole('button',{name:'立即同步',exact:true}).click();
+ assert.equal(await page.getByRole('button',{name:'请稍候…'}).isDisabled(),true);
+ await page.evaluate(()=>window.triSyncPreview.reset('new'));
+ await page.screenshot({path:'dist/ui/mobile-setup.png',fullPage:true});
+ assert.equal(await page.getByRole('button',{name:'开始配置'}).count(),1);
+ assert.deepEqual(errors,[]);
+ console.log('UI smoke checks passed: themes, mobile width, provider switching, validation, secret fields, save and busy state.');
+} finally {await browser.close();}

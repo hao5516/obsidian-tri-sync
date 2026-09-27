@@ -100,3 +100,9 @@ test('插件停用后不再发布版本或更改本地基线',async()=>{
  await assert.rejects(synchronize(s,a,a.state,async()=>{},1024,()=>{if(stopped)throw Error('stopped');}),/stopped/);
  assert.equal([...s.files.keys()].filter(k=>k.startsWith('r-')).length,0);assert.deepEqual(a.state,{});
 });
+test('进度事件与跳过原因能够解释同步结果',async()=>{
+ const s=new MemoryStore(),a=new MemoryLocal('large');const phases:string[]=[];
+ const r=await synchronize(s,a,a.state,async()=>{},2,()=>{},p=>phases.push(p.phase));
+ assert.deepEqual(r.issues,[{path:'笔记.md',reason:'超过单文件大小上限'}]);
+ assert.equal(phases[0],'connecting');assert.equal(phases.at(-1),'files');
+});
