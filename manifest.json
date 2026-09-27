@@ -1,0 +1,5 @@
+{
+  "id": "tri-sync", "name": "Tri Sync 三端同步", "version": "0.1.0",
+  "minAppVersion": "1.8.0", "description": "通过 WebDAV、S3 或百度网盘同步笔记和附件，保留冲突副本。",
+  "author": "Tri Sync", "isDesktopOnly": false
+}
