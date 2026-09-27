@@ -31,7 +31,7 @@ function httpsEndpoint(endpoint: string): string {
 }
 function folderSegments(folder: string): string[] {
   const parts = folder.split('/').filter(Boolean);
-  if (!parts.length || parts.some(p => p === '.' || p === '..' || /[\\\x00-\x1f]/.test(p))) throw new Error('同步目录无效');
+  if (!parts.length || parts.some(p => p === '.' || p === '..' || p.includes('\\') || Array.from(p).some(c => c.charCodeAt(0) < 32))) throw new Error('同步目录无效');
   return parts;
 }
 class WebDAV implements Store {
@@ -84,7 +84,7 @@ class S3 implements Store {
     do {
       const q = new URLSearchParams({'list-type':'2',prefix:this.prefix});
       if (token) q.set('continuation-token',token);
-      const doc = xml((await this.send(this.base+'/?'+q)).text);
+      const doc = xml((await this.send(this.base+'/?'+q.toString())).text);
       for (const e of elements(doc,'Key')) {
         const key = e.textContent ?? '';
         if (key.startsWith(this.prefix) && !key.slice(this.prefix.length).includes('/')) keys.push(key.slice(this.prefix.length));
@@ -158,7 +158,7 @@ class Baidu implements Store {
       const body=new Uint8Array(begin.length+chunks[index].length+end.length);
       body.set(begin); body.set(chunks[index],begin.length); body.set(end,begin.length+chunks[index].length);
       const q=new URLSearchParams({method:'upload',access_token:this.s.baiduToken,type:'tmpfile',path:params.path,uploadid:pre.uploadid,partseq:String(index)});
-      const data=this.check((await http({url:'https://d.pcs.baidu.com/rest/2.0/pcs/superfile2?'+q,method:'POST',contentType:`multipart/form-data; boundary=${boundary}`,body:buffer(body)})).json as BaiduResponse);
+      const data=this.check((await http({url:'https://d.pcs.baidu.com/rest/2.0/pcs/superfile2?'+q.toString(),method:'POST',contentType:`multipart/form-data; boundary=${boundary}`,body:buffer(body)})).json as BaiduResponse);
       if(data.md5!==hashes[index]) throw new Error('百度上传分片校验失败');
     }
     await this.api('create',{...params,uploadid:pre.uploadid},true);

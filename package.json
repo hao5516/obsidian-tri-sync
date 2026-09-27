@@ -1,6 +1,24 @@
 {
-  "name": "obsidian-tri-sync", "version": "0.1.0", "private": true,
-  "scripts": {"build": "tsc --noEmit && node build.mjs", "test": "tsx --test tests/*.test.ts"},
-  "dependencies": {"@noble/hashes": "^1.8.0", "aws4fetch": "^1.0.20"},
-  "devDependencies": {"obsidian": "^1.8.7", "typescript": "^5.8.3", "esbuild": "^0.25.0", "tsx": "^4.19.0", "@types/node": "^22.0.0"}
+  "name": "obsidian-tri-sync",
+  "version": "0.1.1",
+  "private": true,
+  "scripts": {
+    "build": "tsc --noEmit && node build.mjs",
+    "test": "tsx --test tests/*.test.ts",
+    "lint": "eslint src manifest.json LICENSE --max-warnings 0"
+  },
+  "dependencies": {
+    "@noble/hashes": "^1.8.0",
+    "aws4fetch": "^1.0.20"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "esbuild": "^0.25.0",
+    "eslint": "^9.39.5",
+    "eslint-plugin-obsidianmd": "^0.4.2",
+    "obsidian": "^1.8.7",
+    "tsx": "^4.19.0",
+    "typescript": "^5.8.3"
+  },
+  "license": "MIT"
 }

@@ -64,7 +64,7 @@ test('本地删除不上传、不复活已删除文件',async()=>{
  a.files.delete('笔记.md');await run(s,a);await run(s,b);assert.equal(a.files.size,0);assert.equal(b.value(),'v1');
 });
 test('跨平台路径、隐藏配置和路径穿越被拒绝',()=>{
- for(const p of ['../a','a/../b','/etc/a','.obsidian/data','a\\b','a:ads','NUL.md','CON','x.','_TriSync/a'])assert.equal(safePath(p),false,p);
+ for(const p of ['../a','a/../b','/etc/a','.obsidian/data','a\\b','a:ads','NUL.md','CON','x.','_TriSync/a','_trisync/a','_TriSync','a\u00a0b.md'])assert.equal(safePath(p),false,p);
  assert.equal(safePath('项目/你好.md'),true);
 });
 test('损坏或伪造的版本记录被拒绝',()=>{
@@ -93,4 +93,10 @@ test('手动选择冲突版本内容可形成新的合并版本',async()=>{
 test('特殊文件名不会污染基线对象原型',async()=>{
  const s=new MemoryStore(),a=new MemoryLocal();a.files.set('__proto__',encode('data'));await run(s,a);
  assert.ok(Object.prototype.hasOwnProperty.call(a.state,'__proto__'));assert.equal(Object.getPrototypeOf(a.state),Object.prototype);
+});
+test('插件停用后不再发布版本或更改本地基线',async()=>{
+ const s=new MemoryStore(),a=new MemoryLocal('new');let stopped=false;
+ const put=s.put.bind(s);s.put=async(key,bytes)=>{await put(key,bytes);stopped=true;};
+ await assert.rejects(synchronize(s,a,a.state,async()=>{},1024,()=>{if(stopped)throw Error('stopped');}),/stopped/);
+ assert.equal([...s.files.keys()].filter(k=>k.startsWith('r-')).length,0);assert.deepEqual(a.state,{});
 });

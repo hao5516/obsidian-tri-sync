@@ -1,4 +1,20 @@
-# Tri Sync 三端同步 — 0.1.0 测试版
+# Tri Sync 三端同步 — 0.1.1
+
+Sync notes through WebDAV, S3-compatible storage, or Baidu Netdisk, with conflict copies and local backups. The interface currently uses Chinese. This community plugin is not affiliated with Obsidian Sync.
+
+**Submission status:** prepared for community review, not yet listed or approved. Real cloud-account integration and mobile-device testing remain outstanding. See [submission notes](docs/COMMUNITY-SUBMISSION.md).
+
+### Disclosures / 网络与隐私说明
+
+- The plugin is free. A WebDAV/S3 server or a Baidu Netdisk account with the required API permissions is necessary. Storage providers may charge for storage, requests or bandwidth.
+- Network requests go only to the storage endpoint you configure or Baidu's API/upload/download servers, to list, upload and download vault contents. No developer-operated relay server is used.
+- File contents and relative paths leave your device during sync. HTTPS is required; end-to-end encryption is not implemented. The selected provider can read the uploaded data and may keep its own access logs under its policies.
+- Credentials are saved in the plugin's local `data.json` without encryption. Do not share this file. Baidu authorization must be obtained outside the plugin and renewed manually.
+- No advertising, analytics, client-side telemetry, remote executable code or self-updater is included. The plugin does not access files outside the active vault. It uses Obsidian's plugin settings storage for settings and baselines.
+- Automatic sync is disabled by default. Once enabled it runs while Obsidian is active; mobile background execution is not guaranteed.
+- Deletions and renames are not propagated. New attachments sync; updates to existing binary attachments require manual replacement from `_TriSync/incoming`. Remote history is retained without automatic garbage collection.
+
+License: [MIT](LICENSE), copyright 2026 hao5516. Bundled dependencies: `@noble/hashes` (Paul Miller, MIT) and `aws4fetch` (Michael Hart, MIT). Their full notices are embedded in every released `main.js` and included in the ZIP. See [third-party notices](THIRD-PARTY-NOTICES.txt).
 
 面向 Windows、macOS、Android 和 iOS 的 Obsidian 社区插件。三台设备使用同一服务、同一同步目录，即可交换笔记和新附件。运行时代码使用 Obsidian Vault / requestUrl 和浏览器 API，不依赖 Node.js、Electron 或桌面文件路径。
 
@@ -16,9 +32,9 @@
 
 ## 安装
 
-1. 解压 `dist/tri-sync-0.1.0.zip`，得到 `tri-sync` 文件夹，内含 `main.js`、`manifest.json`。
+1. 从 [Releases](https://github.com/hao5516/obsidian-tri-sync/releases) 下载 `tri-sync-0.1.1.zip` 并解压，得到 `tri-sync` 文件夹，内含 `main.js`、`manifest.json` 和许可证声明。
 2. 在每台设备的笔记库中，将这个文件夹放到 `.obsidian/plugins/tri-sync/`。不要多嵌套一层目录。
-3. 重启 Obsidian，进入「设置 → 第三方插件」，允许并启用 **Tri Sync 三端同步**。
+3. 重启 Obsidian，进入「设置 → 第三方插件」，允许并启用 **Tri Sync**。
 4. 打开插件设置，三端配置相同的服务和远端目录。使用不同笔记库时必须使用不同远端目录。
 5. 在内容最完整的设备上点击「测试连接」，再点「立即同步」。完成后在其他设备分别执行同步。
 6. 验证后可开启自动同步，默认间隔 300 秒，最短 60 秒。
@@ -80,6 +96,7 @@ R2 等服务的区域和桶地址请按其文档填写。插件不会创建桶�
 
 ```sh
 npm ci
+npm run lint
 npm run build
 npm test
 ```
